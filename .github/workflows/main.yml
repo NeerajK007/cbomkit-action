@@ -14,9 +14,16 @@ jobs:
       - name: Create CBOM
         uses: PQCA/cbomkit-action@v1.1.0
         id: cbom
+        continue-on-error: true
+      - name: Check CBOM generation success
+        if: steps.cbom.outcome != 'success'
+        run: |
+          echo "CBOM generation failed!"
+          exit 1
       # Allow you to persist CBOM after a job has completed, and share 
       # that CBOM with another job in the same workflow.
       - name: Create and publish CBOM artifact
+        if: steps.cbom.outcome == 'success'
         uses: actions/upload-artifact@v4
         with:
           name: "CBOM"
